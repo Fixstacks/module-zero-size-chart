@@ -1,0 +1,45 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Catalog > Size Charts: every chart, its categories and state.
+ *
+ * @var \Magento\Backend\Block\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \Zero\SizeChart\ViewModel\Admin $admin */
+$admin = $block->getData('view_model');
+$names = $admin->categoryNames();
+?>
+<div class="page-actions-buttons" style="margin-bottom: 20px; text-align: right;">
+    <a class="action-primary" href="<?= $escaper->escapeUrl($admin->url('zero_sizechart/chart/edit')) ?>"><?= $escaper->escapeHtml(__('Add Size Chart')) ?></a>
+</div>
+<p><?= $escaper->escapeHtml(__('A chart shows on the product pages of its categories (and everything under them) as a "Size guide" button. A product can pick another chart, or none, with its Size Chart attribute.')) ?></p>
+<table class="data-grid">
+    <thead>
+        <tr>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Name')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Categories')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Rows')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Active')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Updated')) ?></th>
+            <th class="data-grid-th"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($admin->all() as $chart): ?>
+            <tr>
+                <td><?= $escaper->escapeHtml($chart['name']) ?></td>
+                <td><?= $escaper->escapeHtml(implode(', ', array_map(static fn (int $id) => $names[$id] ?? (string) $id, $chart['category_ids'])) ?: '—') ?></td>
+                <td><?= count($chart['table']['rows']) ?></td>
+                <td><?= $chart['is_active'] ? $escaper->escapeHtml(__('Yes')) : $escaper->escapeHtml(__('No')) ?></td>
+                <td><?= $escaper->escapeHtml($chart['updated_at']) ?></td>
+                <td><a href="<?= $escaper->escapeUrl($admin->url('zero_sizechart/chart/edit', ['id' => $chart['chart_id']])) ?>"><?= $escaper->escapeHtml(__('Edit')) ?></a></td>
+            </tr>
+        <?php endforeach; ?>
+        <?php if (!$admin->all()): ?>
+            <tr><td colspan="6"><?= $escaper->escapeHtml(__('No size charts yet.')) ?></td></tr>
+        <?php endif; ?>
+    </tbody>
+</table>

@@ -1,0 +1,98 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * A size chart's form: name, heading, the table as text (one row per line,
+ * cells separated by "|"), note, categories, state.
+ *
+ * @var \Magento\Backend\Block\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \Zero\SizeChart\ViewModel\Admin $admin */
+$admin = $block->getData('view_model');
+$chart = $admin->current();
+$value = static fn (string $key) => (string) ($chart[$key] ?? '');
+$chosen = $chart['category_ids'] ?? [];
+?>
+<form class="zero-size-chart-form" method="post" action="<?= $escaper->escapeUrl($admin->url('zero_sizechart/chart/save')) ?>">
+    <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($admin->formKey()) ?>">
+    <?php if ($chart): ?><input type="hidden" name="id" value="<?= (int) $chart['chart_id'] ?>"><?php endif; ?>
+    <fieldset class="admin__fieldset">
+        <div class="admin__field _required">
+            <label class="admin__field-label" for="chart-name"><span><?= $escaper->escapeHtml(__('Name')) ?></span></label>
+            <div class="admin__field-control">
+                <input class="admin__control-text" id="chart-name" name="name" required value="<?= $escaper->escapeHtmlAttr($value('name')) ?>">
+                <div class="admin__field-note"><?= $escaper->escapeHtml(__('For this list and the product attribute.')) ?></div>
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label" for="chart-heading"><span><?= $escaper->escapeHtml(__('Heading')) ?></span></label>
+            <div class="admin__field-control">
+                <input class="admin__control-text" id="chart-heading" name="heading" value="<?= $escaper->escapeHtmlAttr($chart ? (string) ($chart['heading'] !== $chart['name'] ? $chart['heading'] : '') : '') ?>">
+                <div class="admin__field-note"><?= $escaper->escapeHtml(__('The title customers see. Empty: the name.')) ?></div>
+            </div>
+        </div>
+        <div class="admin__field _required">
+            <label class="admin__field-label" for="chart-table"><span><?= $escaper->escapeHtml(__('Table')) ?></span></label>
+            <div class="admin__field-control">
+                <textarea class="admin__control-textarea" id="chart-table" name="table" rows="10" required style="font-family: monospace;"><?= $escaper->escapeHtml($admin->tableText($chart)) ?></textarea>
+                <div class="admin__field-note"><?= $escaper->escapeHtml(__('One row per line, cells separated by "|". The first line is the heading row.')) ?></div>
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label" for="chart-note"><span><?= $escaper->escapeHtml(__('Note')) ?></span></label>
+            <div class="admin__field-control">
+                <textarea class="admin__control-textarea" id="chart-note" name="note" rows="3"><?= $escaper->escapeHtml($value('note')) ?></textarea>
+                <div class="admin__field-note"><?= $escaper->escapeHtml(__('Under the table: how to measure, between sizes take the larger, and so on.')) ?></div>
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Categories')) ?></span></label>
+            <div class="admin__field-control">
+                <div style="max-height: 20rem; overflow: auto; border: 1px solid #adadad; padding: 8px 12px; background: #fff;">
+                    <?php foreach ($admin->categories() as $category): ?>
+                        <label style="display: block; padding-left: <?= ($category['level'] - 1) * 1.25 ?>em;">
+                            <input type="checkbox" name="category_ids[]" value="<?= (int) $category['id'] ?>"<?= in_array($category['id'], $chosen, true) ? ' checked' : '' ?>>
+                            <?= $escaper->escapeHtml($category['name']) ?>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+                <div class="admin__field-note"><?= $escaper->escapeHtml(__('The chart shows on the products of these categories and of everything under them. A product in two charts\' categories gets the more specific one.')) ?></div>
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label" for="chart-sort"><span><?= $escaper->escapeHtml(__('Sort Order')) ?></span></label>
+            <div class="admin__field-control">
+                <input class="admin__control-text" type="number" min="0" id="chart-sort" name="sort_order" value="<?= (int) ($chart['sort_order'] ?? 0) ?>" style="width: 6em;">
+                <div class="admin__field-note"><?= $escaper->escapeHtml(__('Between two charts of the same category, the lower number wins.')) ?></div>
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label" for="chart-active"><span><?= $escaper->escapeHtml(__('Active')) ?></span></label>
+            <div class="admin__field-control">
+                <label><input type="checkbox" id="chart-active" name="is_active" value="1"<?= $chart === null || !empty($chart['is_active']) ? ' checked' : '' ?>> <?= $escaper->escapeHtml(__('Shown on the storefront')) ?></label>
+            </div>
+        </div>
+    </fieldset>
+    <div class="admin__field">
+        <div class="admin__field-control" style="display: flex; gap: 12px;">
+            <button type="submit" class="action-primary"><?= $escaper->escapeHtml(__('Save Size Chart')) ?></button>
+            <a class="action-secondary" href="<?= $escaper->escapeUrl($admin->url('zero_sizechart/chart/index')) ?>"><?= $escaper->escapeHtml(__('Back')) ?></a>
+            <?php if ($chart): ?>
+                <button type="submit" name="delete" value="1" class="action-tertiary" formnovalidate><?= $escaper->escapeHtml(__('Delete Size Chart')) ?></button>
+            <?php endif; ?>
+        </div>
+    </div>
+</form>
+<?php if ($chart): ?>
+    <h2 style="margin-top: 2rem;"><?= $escaper->escapeHtml(__('Preview')) ?></h2>
+    <table class="data-grid" style="max-width: 48rem;">
+        <thead><tr><?php foreach ($chart['table']['columns'] as $column): ?><th class="data-grid-th"><?= $escaper->escapeHtml($column) ?></th><?php endforeach; ?></tr></thead>
+        <tbody>
+            <?php foreach ($chart['table']['rows'] as $row): ?>
+                <tr><?php foreach ($row as $cell): ?><td><?= $escaper->escapeHtml($cell) ?></td><?php endforeach; ?></tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>

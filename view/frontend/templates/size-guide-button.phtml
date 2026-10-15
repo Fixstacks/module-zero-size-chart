@@ -1,0 +1,31 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * The "Size guide" button, inside the product form above Add to Cart. It
+ * opens the dialog of size-guide.phtml (rendered outside the form: a
+ * <dialog> with its own closing <form> can't be nested in another form).
+ *
+ * @var \Magento\Catalog\Block\Product\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \Zero\SizeChart\ViewModel\SizeGuide $viewModel */
+$viewModel = $block->getData('view_model');
+$product = $block->getProduct();
+$chart = $product ? $viewModel->chart($product) : null;
+if (!$chart) {
+    return;
+}
+$dialogId = 'size-guide-' . (int) $chart['chart_id'];
+?>
+<div class="zero-size-guide mb-4">
+    <button type="button" class="btn btn-ghost btn-sm gap-2 px-0 link link-neutral no-underline hover:underline"
+            data-dialog-open="#<?= $escaper->escapeHtmlAttr($dialogId) ?>"
+            aria-haspopup="dialog" aria-controls="<?= $escaper->escapeHtmlAttr($dialogId) ?>">
+        <svg aria-hidden="true" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.5l4.5-4.5L21 17.5 16.5 22 3 8.5z"/><path d="M8 7l1.5 1.5M11 4l1.5 1.5M14 10l1.5 1.5M17 7l1.5 1.5M11 13l1.5 1.5"/>
+        </svg>
+        <?= $escaper->escapeHtml($viewModel->buttonText($product)) ?>
+    </button>
+</div>

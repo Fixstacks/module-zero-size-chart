@@ -1,0 +1,21 @@
+{
+    "zero_size_chart": {
+        "column": {
+            "chart_id": true,
+            "name": true,
+            "heading": true,
+            "is_active": true,
+            "table_json": true,
+            "note": true,
+            "category_ids": true,
+            "sort_order": true,
+            "updated_at": true
+        },
+        "index": {
+            "ZERO_SIZE_CHART_IS_ACTIVE_SORT_ORDER": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

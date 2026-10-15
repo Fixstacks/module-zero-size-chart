@@ -1,0 +1,58 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * The size guide's <dialog>, after the product form (never inside it: its
+ * closing <form method="dialog"> would be swallowed by the product form).
+ * Opened by size-guide-button.phtml through web/js/zero.js's
+ * data-dialog-open. Nothing when the product has no chart.
+ *
+ * @var \Magento\Catalog\Block\Product\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \Zero\SizeChart\ViewModel\SizeGuide $viewModel */
+$viewModel = $block->getData('view_model');
+$product = $block->getProduct();
+$chart = $product ? $viewModel->chart($product) : null;
+if (!$chart) {
+    return;
+}
+$dialogId = 'size-guide-' . (int) $chart['chart_id'];
+?>
+<dialog id="<?= $escaper->escapeHtmlAttr($dialogId) ?>" class="zero-size-guide-dialog modal" aria-labelledby="<?= $escaper->escapeHtmlAttr($dialogId) ?>-title">
+    <div class="modal-box max-w-2xl">
+        <h3 id="<?= $escaper->escapeHtmlAttr($dialogId) ?>-title" class="font-display text-xl mb-4"><?= $escaper->escapeHtml($chart['heading']) ?></h3>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra table-sm">
+                <thead>
+                    <tr>
+                        <?php foreach ($chart['table']['columns'] as $column): ?>
+                            <th scope="col"><?= $escaper->escapeHtml($column) ?></th>
+                        <?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($chart['table']['rows'] as $row): ?>
+                        <tr>
+                            <?php foreach ($row as $i => $cell): ?>
+                                <?php if ($i === 0): ?>
+                                    <th scope="row" class="font-medium"><?= $escaper->escapeHtml($cell) ?></th>
+                                <?php else: ?>
+                                    <td><?= $escaper->escapeHtml($cell) ?></td>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php if ($chart['note'] !== ''): ?>
+            <p class="mt-4 text-sm text-base-content/70 whitespace-pre-line"><?= $escaper->escapeHtml($chart['note']) ?></p>
+        <?php endif; ?>
+        <form method="dialog" class="modal-action">
+            <button type="submit" class="btn btn-neutral"><?= $escaper->escapeHtml(__('Close')) ?></button>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button type="submit" aria-label="<?= $escaper->escapeHtmlAttr(__('Close')) ?>"></button></form>
+</dialog>

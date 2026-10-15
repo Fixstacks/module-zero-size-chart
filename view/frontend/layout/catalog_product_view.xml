@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    The "Size guide" button above Add to Cart, and its dialog after the
+    product form. The form renders one of two branches, product.info.form
+    .options for products with options (configurables) and product.info
+    .form.content for the rest, so the button goes in both; one prints. The
+    dialog sits outside the form: its closing <form method="dialog"> can't
+    be nested in the product form.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.form.options">
+            <block class="Zero\SizeChart\Block\SizeGuide" name="zero.size.guide.button" template="Zero_SizeChart::size-guide-button.phtml"
+                   after="product.info.options.wrapper">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Zero\SizeChart\ViewModel\SizeGuide</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceContainer name="product.info.form.content">
+            <block class="Zero\SizeChart\Block\SizeGuide" name="zero.size.guide.button.simple" template="Zero_SizeChart::size-guide-button.phtml"
+                   before="product.info.addtocart">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Zero\SizeChart\ViewModel\SizeGuide</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="product.info.main">
+            <block class="Zero\SizeChart\Block\SizeGuide" name="zero.size.guide" template="Zero_SizeChart::size-guide.phtml" after="product.info">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Zero\SizeChart\ViewModel\SizeGuide</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
