@@ -2,7 +2,7 @@
     "name": "fixstacks/module-zero-size-chart",
     "description": "Zero for Magento Open Source: size guides on product pages: tables made in the admin, shown by category or per product in a dialog.",
     "type": "magento2-module",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
