@@ -1,4 +1,4 @@
-# fixstacks/module-zero-size-chart — licensing
+# zerofront/module-zero-size-chart — licensing
 
 Copyright © 2026 Roman Pasichnyk.
 
